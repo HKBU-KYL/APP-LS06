@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreBluetooth
+import SwiftChart
 
 class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDelegate, UITextFieldDelegate {
     
@@ -15,7 +16,11 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     var heartRateMonitor:CBPeripheral?
     var characteristic_2a38:CBCharacteristic?
     var characteristic_2a39:CBCharacteristic?
+    
+    var heartRateData:[Double] = []
 
+    @IBOutlet var chart: Chart!
+    
     @IBOutlet var stateLabel: UILabel!
     @IBOutlet var heartLabel: UILabel!
     @IBOutlet var locLabel: UILabel!
@@ -195,8 +200,23 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
                 
                 heartLabel.text = "\(value)"
                 
+                if (heartRateData.count >= 20) {
+                    heartRateData.removeFirst()
+                }
+                
+                heartRateData.append(Double(value))
+                
+                let series = ChartSeries(heartRateData)
+                series.color = ChartColors.greenColor()
+                chart.removeAllSeries()
+                chart.add(series)
+                
+                chart.setNeedsDisplay()
+                
             }
         }
+        
+       
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
